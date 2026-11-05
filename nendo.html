@@ -51,6 +51,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 #layers { position: absolute; top: 10px; max-height: calc(100% - 100px); right: max(8px, env(safe-area-inset-right, 0px)); width: var(--layers-w); display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); overflow: hidden; }
 #layers header { display: flex; align-items: center; justify-content: space-between; padding: 6px 6px 6px 10px; border-bottom: 1px solid var(--line); }
 #layers header span { font-size: 11px; color: var(--muted); letter-spacing: .12em; }
+#othersBtn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--raise); cursor: pointer; display: grid; place-items: center; color: var(--muted); flex: 0 0 auto; margin-right: 4px; padding: 0; }
+#othersBtn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#othersBtn[data-mode="ghost"], #othersBtn[data-mode="hide"] { color: var(--cool); border-color: var(--cool); background: color-mix(in srgb, var(--cool) 16%, var(--panel-solid)); }
 #addBtn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--raise); font-size: 20px; line-height: 1; cursor: pointer; display: grid; place-items: center; }
 #layerList { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 4px; display: flex; flex-direction: column; gap: 3px; -webkit-overflow-scrolling: touch; }
 .layer { display: grid; grid-template-columns: 12px minmax(0, 1fr) 30px; align-items: center; gap: 6px; min-height: 42px; padding: 0 2px 0 8px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; }
@@ -98,6 +101,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 #outBar .prow > button.half { flex: 1; }
 #outSet { display: flex; flex-direction: column; gap: 2px; }
 #outBar #outFold { padding: 0 10px; }
+#outBar #outEnd.done { min-width: 84px; height: 44px; background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; font-size: 14px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
 #outBar output { font-family: var(--font-num); width: 36px; text-align: right; }
 #outBar button.go { flex: 1; height: auto; min-height: 42px; padding: 4px 12px; background: var(--cool); color: #06202a; border-color: var(--cool); font-weight: 600; line-height: 1.35; }
 #outBar button.go small { display: block; font-weight: 400; font-size: 10px; }
@@ -126,12 +130,17 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 #favs button.inverted { color: var(--cool); border-color: var(--cool); }
 #favs button.inverted[aria-pressed="true"] { background: var(--cool); color: #06202a; }
 .tgw { position: relative; }
+.haspop::after { content: ''; position: absolute; right: 3px; bottom: 3px; width: 0; height: 0; border-left: 6px solid transparent; border-bottom: 6px solid currentColor; opacity: .55; pointer-events: none; }
 .tgw .tg { width: 100%; }
 .tgw .star { position: absolute; top: 2px; right: 2px; width: 30px; height: 30px; border: 0; background: transparent; color: var(--muted); font-size: 17px; line-height: 1; cursor: pointer; border-radius: 8px; padding: 0; }
 .tgw .star[aria-pressed="true"] { color: #f2c94c; }
 .tgw .tg[aria-pressed="true"] + .star[aria-pressed="true"] { color: var(--accent-ink); }
 #maskBtn.clear { border-color: var(--cool); color: var(--cool); }
 #maskBtn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+#pivotPop { position: absolute; left: 58px; top: 130px; z-index: 9; display: flex; gap: 4px; padding: 4px; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.4); max-width: calc(100% - 70px); flex-wrap: wrap; }
+#pivotPop button { flex: 0 0 auto; min-width: 56px; height: 44px; padding: 0 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--raise); font-size: 12px; cursor: pointer; }
+#pivotPop button.hot { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+#pivotBtn { touch-action: none; -webkit-touch-callout: none; }
 #maskPop { position: absolute; left: 58px; top: 190px; z-index: 9; display: flex; gap: 4px; padding: 4px; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.4); max-width: calc(100% - 70px); flex-wrap: wrap; }
 #maskPop button { flex: 0 0 auto; min-width: 56px; height: 44px; padding: 0 8px; border-radius: 9px; border: 1px solid var(--line); background: var(--raise); font-size: 12px; cursor: pointer; }
 #maskPop button.hot { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
@@ -149,7 +158,13 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .qt:disabled { opacity: .35; }
 
 #brushes { align-items: stretch; }
-.toolgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; }
+.toolgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.toolgrid .tg { height: auto; min-height: 62px; flex-direction: row; justify-content: flex-start; gap: 10px; padding: 8px 30px 8px 10px; text-align: left; }
+.toolgrid .tg svg { flex: 0 0 auto; }
+.toolgrid .tg .tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.toolgrid .tg .tx b { font-size: 13px; font-weight: 600; }
+.toolgrid .tg .tx small { font-size: 10.5px; line-height: 1.35; color: var(--muted); font-weight: 400; }
+.toolgrid .tg[aria-pressed="true"] .tx small { color: color-mix(in srgb, var(--accent-ink) 75%, transparent); }
 .tg { height: 72px; border-radius: 12px; border: 1px solid var(--line); background: var(--raise); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; font-size: 12px; }
 .tg svg { width: 26px; height: 26px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .tg[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
@@ -195,7 +210,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .tfgrid input { width: 100%; min-width: 0; height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); padding: 0 8px; font-family: var(--font-num); font-size: 16px; -webkit-user-select: text; user-select: text; }
 
 #top { grid-row: 1; } #params { grid-row: 2; } #view { grid-row: 3; } #bar { grid-row: 4; }
-#app.clean #bar, #app.clean #layers, #app.clean #quick, #app.clean #frontBtn, #app.clean #projBtn, #app.clean #pivotBtn, #app.clean #maskBtn, #app.clean #favs, #app.clean #maskPop, #app.clean #orbitPad, #app.clean #params, #app.clean #hint, #app.clean #tfWrap, #app.clean #trimWrap, #app.clean #ltBar, #app.clean #outBar { display: none !important; }
+#app.clean #bar, #app.clean #layers, #app.clean #quick, #app.clean #frontBtn, #app.clean #projBtn, #app.clean #pivotBtn, #app.clean #maskBtn, #app.clean #favs, #app.clean #maskPop, #app.clean #pivotPop, #app.clean #orbitPad, #app.clean #params, #app.clean #hint, #app.clean #tfWrap, #app.clean #trimWrap, #app.clean #ltBar, #app.clean #outBar { display: none !important; }
 #cleanBtn[aria-pressed="true"] { color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); }
 .symgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .symgrid .sb { min-height: 56px; font-size: 15px; }
@@ -338,14 +353,15 @@ input.sw::-webkit-color-swatch-wrapper { padding: 0; } input.sw::-webkit-color-s
   </div>
   <main id="view">
     <div id="hint">1本指：物体の上で彫る・外で回す／2本指：拡大・移動／2本指タップ：元に戻す</div>
-    <button id="frontBtn" class="vb" aria-label="正面から見る"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M12 2v3M12 19v3"/></svg><span>正面</span></button>
+    <button id="frontBtn" class="vb haspop" aria-label="正面から見る"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M12 2v3M12 19v3"/></svg><span>正面</span></button>
     <div id="viewPop" hidden role="menu" aria-label="見る向き">
       <button data-v="front">正面</button><button data-v="right">横</button><button data-v="back">後ろ</button><button data-v="top">上</button><button data-v="left">左</button><button data-v="bottom">下</button>
     </div>
     <button id="projBtn" class="vb" aria-label="パースと平行投影を切り替え" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 18 9 6h6l5 12z"/></svg><span>パース</span></button>
-    <button id="pivotBtn" class="vb" aria-label="回転の中心を指定" aria-pressed="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg><span>中心</span></button>
-    <button id="maskBtn" class="vb" aria-label="マスク（長押しでメニュー）" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 20c2-6 5-9 9-11"/><path d="M13 9l3-5 4 4-5 3z"/></svg><span>マスク</span></button>
+    <button id="pivotBtn" class="vb haspop" aria-label="回転の中心を指定" aria-pressed="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg><span>中心</span></button>
+    <button id="maskBtn" class="vb haspop" aria-label="マスク（長押しでメニュー）" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 20c2-6 5-9 9-11"/><path d="M13 9l3-5 4 4-5 3z"/></svg><span>マスク</span></button>
     <div id="favs" aria-label="よく使うツール"></div>
+    <div id="pivotPop" hidden role="menu" aria-label="回転の中心"><button data-pv="origin">原点に戻す</button><button data-pv="all">全体の真ん中</button><button data-pv="active">選んでいる形の真ん中</button></div>
     <div id="maskPop" hidden role="menu" aria-label="マスク"><button data-mk="mask">マスク</button><button data-mk="lasso">範囲マスク</button><button data-mk="invert">反転</button><button data-mk="clear">全解除</button></div>
     <button id="orbitPad" aria-label="押してドラッグで回転"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v4h-4"/></svg><span>押して回す</span></button>
     <div id="quick">
@@ -354,7 +370,7 @@ input.sw::-webkit-color-swatch-wrapper { padding: 0; } input.sw::-webkit-color-s
       <button class="qt" id="penBtn" aria-pressed="false">ペン専用</button>
     </div>
     <aside id="layers" aria-label="レイヤー">
-      <header><button id="layFold" aria-label="レイヤーを縮小表示" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M14 6l6 6-6 6"/><path d="M4 6h6M4 12h8M4 18h6"/></svg></button><span>レイヤー</span><button id="addBtn" aria-label="形を追加">+</button></header>
+      <header><button id="layFold" aria-label="レイヤーを縮小表示" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M14 6l6 6-6 6"/><path d="M4 6h6M4 12h8M4 18h6"/></svg></button><span>レイヤー</span><button id="othersBtn" aria-label="ほかのレイヤーの見え方" title="ほかのレイヤー：表示／半透明／非表示"></button><button id="addBtn" aria-label="形を追加">+</button></header>
       <div id="layerList"></div>
       <footer>もう一度タップで編集</footer>
     </aside>
@@ -868,21 +884,97 @@ function dab(c, R, P) {
   }
   return ids;
 }
-function subdivideAll(sm) {
-  if (sm.nT * 4 > 1200000) { toast('これ以上細かくすると重くなりすぎます', 'err'); return false; }
-  const d = sm.dump(); const nV = sm.nV; const edge = new Map();
-  const pos = Array.from(d.pos); const idx = []; const mk = Array.from(d.mask); const pt = Array.from(d.paint);
-  const mid = (a, b) => { const k = a < b ? a * 4194304 + b : b * 4194304 + a; let m = edge.get(k); if (m === undefined) { m = pos.length / 3; mk.push((d.mask[a] + d.mask[b]) / 2); for (let q = 0; q < 4; q++) pt.push((d.paint[a * 4 + q] + d.paint[b * 4 + q]) / 2); pos.push((d.pos[a * 3] + d.pos[b * 3]) / 2, (d.pos[a * 3 + 1] + d.pos[b * 3 + 1]) / 2, (d.pos[a * 3 + 2] + d.pos[b * 3 + 2]) / 2); edge.set(k, m); } return m; };
-  for (let t = 0; t < sm.nT; t++) {
-    const a = d.idx[t * 3], b = d.idx[t * 3 + 1], c = d.idx[t * 3 + 2];
-    const ab = mid(a, b), bc = mid(b, c), ca = mid(c, a);
-    idx.push(a, ab, ca, ab, b, bc, ca, bc, c, ab, bc, ca);
+// 細分化（ディバイド）：面を4つに割る。round=true なら Loop 細分化で全体をなめらかに丸める（マスクした所は形を保つ）
+function subdivideAll(sm, round = state.divRound) {
+  const live = sm.liveTris();
+  if (live.length * 4 > 1200000) { toast('これ以上細かくすると重くなりすぎます', 'err'); return false; }
+  const d = sm.dump(); const nV = sm.nV; const P0 = d.pos, M0 = d.mask, C0 = d.paint;
+  const edge = new Map(); const ek = (a, b) => (a < b ? a * 4194304 + b : b * 4194304 + a);
+  const nb = Array.from({ length: nV }, () => new Set());
+  for (const t of live) {
+    const v = [d.idx[t * 3], d.idx[t * 3 + 1], d.idx[t * 3 + 2]];
+    for (let k = 0; k < 3; k++) {
+      const a = v[k], b = v[(k + 1) % 3], c = v[(k + 2) % 3]; nb[a].add(b); nb[b].add(a);
+      const key = ek(a, b); let e = edge.get(key); if (!e) { e = { a, b, opp: [], m: -1 }; edge.set(key, e); } e.opp.push(c);
+    }
   }
-  sm.load({ pos: new Float32Array(pos), idx: new Uint32Array(idx), mask: new Float32Array(mk), paint: new Float32Array(pt) });
-  // gentle smoothing of new midpoints only
-  const out = [0, 0, 0];
-  for (let pass = 0; pass < 2; pass++) for (let v = nV; v < sm.nV; v++) { sm.neighborAvg(v, out); const i = v * 3; sm.pos[i] += (out[0] - sm.pos[i]) * 0.35; sm.pos[i + 1] += (out[1] - sm.pos[i + 1]) * 0.35; sm.pos[i + 2] += (out[2] - sm.pos[i + 2]) * 0.35; }
+  const nE = edge.size; const pos = new Float32Array((nV + nE) * 3), mk = new Float32Array(nV + nE), pt = new Float32Array((nV + nE) * 4);
+  pos.set(P0); mk.set(M0); pt.set(C0);
+  // boundary neighbours (edges used by only one face)
+  const bnd = Array.from({ length: nV }, () => []);
+  for (const e of edge.values()) if (e.opp.length === 1) { bnd[e.a].push(e.b); bnd[e.b].push(e.a); }
+  // new points on edges
+  let m = nV;
+  for (const e of edge.values()) {
+    e.m = m; const a = e.a, b = e.b;
+    for (let q = 0; q < 3; q++) {
+      const lin = (P0[a * 3 + q] + P0[b * 3 + q]) / 2; let val = lin;
+      if (round && e.opp.length === 2) { const c = e.opp[0], dd = e.opp[1]; const loop = 0.375 * (P0[a * 3 + q] + P0[b * 3 + q]) + 0.125 * (P0[c * 3 + q] + P0[dd * 3 + q]); val = lin + (loop - lin) * (1 - (M0[a] + M0[b]) / 2); }
+      pos[m * 3 + q] = val;
+    }
+    mk[m] = (M0[a] + M0[b]) / 2; for (let q = 0; q < 4; q++) pt[m * 4 + q] = (C0[a * 4 + q] + C0[b * 4 + q]) / 2;
+    m++;
+  }
+  // move the old points (Loop rule)
+  if (round) for (let v = 0; v < nV; v++) {
+    const n = nb[v].size; if (!n) continue; const w = 1 - M0[v]; if (w <= 0) continue;
+    let tx, ty, tz;
+    if (bnd[v].length === 2) { const [p1, p2] = bnd[v]; tx = 0.75 * P0[v * 3] + 0.125 * (P0[p1 * 3] + P0[p2 * 3]); ty = 0.75 * P0[v * 3 + 1] + 0.125 * (P0[p1 * 3 + 1] + P0[p2 * 3 + 1]); tz = 0.75 * P0[v * 3 + 2] + 0.125 * (P0[p1 * 3 + 2] + P0[p2 * 3 + 2]); }
+    else if (bnd[v].length) continue;
+    else { const beta = n === 3 ? 3 / 16 : 3 / (8 * n); let sx = 0, sy = 0, sz = 0; for (const u of nb[v]) { sx += P0[u * 3]; sy += P0[u * 3 + 1]; sz += P0[u * 3 + 2]; } tx = (1 - n * beta) * P0[v * 3] + beta * sx; ty = (1 - n * beta) * P0[v * 3 + 1] + beta * sy; tz = (1 - n * beta) * P0[v * 3 + 2] + beta * sz; }
+    pos[v * 3] += (tx - P0[v * 3]) * w; pos[v * 3 + 1] += (ty - P0[v * 3 + 1]) * w; pos[v * 3 + 2] += (tz - P0[v * 3 + 2]) * w;
+  }
+  const idx = new Uint32Array(live.length * 12); let o = 0;
+  for (const t of live) {
+    const a = d.idx[t * 3], b = d.idx[t * 3 + 1], c = d.idx[t * 3 + 2];
+    const ab = edge.get(ek(a, b)).m, bc = edge.get(ek(b, c)).m, ca = edge.get(ek(c, a)).m;
+    idx.set([a, ab, ca, ab, b, bc, ca, bc, c, ab, bc, ca], o); o += 12;
+  }
+  sm.load({ pos, idx, mask: mk, paint: pt });
   sm.mesh.geometry = sm.geo;
+}
+// 面を減らす：形の変化が小さい辺から順にまとめる（二次誤差＝QEM）。細かく彫った所や角は残りやすい
+function decimate(sm, ratio) {
+  const live0 = sm.liveTris().length; const target = Math.max(200, Math.round(live0 * ratio));
+  if (live0 <= target + 10) { toast('これ以上は減らせません', 'err'); return false; }
+  const P = sm.pos, ix = sm.idx, vt = sm.vt, nV = sm.nV;
+  const Q = new Float64Array(nV * 10); const f = [0, 0, 0];
+  for (let t = 0; t < sm.nT; t++) {
+    const a = ix[t * 3], b = ix[t * 3 + 1], c = ix[t * 3 + 2]; if (a === b || b === c || a === c) continue;
+    sm.faceN(t, f); const L = Math.hypot(f[0], f[1], f[2]); if (L < 1e-12) continue;
+    const nx = f[0] / L, ny = f[1] / L, nz = f[2] / L, d = -(nx * P[a * 3] + ny * P[a * 3 + 1] + nz * P[a * 3 + 2]); const w = L / 2;
+    const q = [nx * nx, nx * ny, nx * nz, nx * d, ny * ny, ny * nz, ny * d, nz * nz, nz * d, d * d];
+    for (const v of [a, b, c]) for (let k = 0; k < 10; k++) Q[v * 10 + k] += q[k] * w;
+  }
+  const ver = new Uint32Array(nV);
+  const cost = (a, b) => {
+    const x = (P[a * 3] + P[b * 3]) / 2, y = (P[a * 3 + 1] + P[b * 3 + 1]) / 2, z = (P[a * 3 + 2] + P[b * 3 + 2]) / 2; let e = 0;
+    const qa = a * 10, qb = b * 10; const q = (k) => Q[qa + k] + Q[qb + k];
+    e = q(0) * x * x + 2 * q(1) * x * y + 2 * q(2) * x * z + 2 * q(3) * x + q(4) * y * y + 2 * q(5) * y * z + 2 * q(6) * y + q(7) * z * z + 2 * q(8) * z + q(9);
+    return Math.max(0, e) + sm.edgeLen2(a, b) * 1e-4; // 同じくらいなら短い辺から
+  };
+  // binary heap of [cost, a, b, verA, verB]
+  const H = []; const push = (it) => { H.push(it); let i = H.length - 1; while (i) { const p2 = (i - 1) >> 1; if (H[p2][0] <= it[0]) break; H[i] = H[p2]; i = p2; } H[i] = it; };
+  const pop = () => { const top = H[0], last = H.pop(); if (H.length) { H[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < H.length && H[l][0] < H[m][0]) m = l; if (r < H.length && H[r][0] < H[m][0]) m = r; if (m === i) break; const t2 = H[i]; H[i] = H[m]; H[m] = t2; i = m; } } return top; };
+  const seen = new Set();
+  for (let t = 0; t < sm.nT; t++) for (let k = 0; k < 3; k++) { let a = ix[t * 3 + k], b = ix[t * 3 + ((k + 1) % 3)]; if (a === b) continue; if (a > b) { const s2 = a; a = b; b = s2; } const key = a * 4194304 + b; if (seen.has(key)) continue; seen.add(key); push([cost(a, b), a, b, 0, 0]); }
+  let live = live0; let guard = 0;
+  while (live > target && H.length && guard++ < 5e6) {
+    const [, a, b, va, vb] = pop();
+    if (ver[a] !== va || ver[b] !== vb || !vt[a].length || !vt[b].length) continue;
+    if (!sm.collapse(a, b)) continue;
+    live -= 2; for (let k = 0; k < 10; k++) Q[a * 10 + k] += Q[b * 10 + k];
+    ver[a]++; ver[b]++;
+    const nbs = new Set(); for (const t of vt[a]) for (let k = 0; k < 3; k++) { const u = ix[t * 3 + k]; if (u !== a) nbs.add(u); }
+    for (const u of nbs) ver[u]++;
+    for (const u of nbs) { const x = Math.min(a, u), y = Math.max(a, u); push([cost(x, y), x, y, ver[x], ver[y]]); }
+  }
+  // 使わなくなった点と潰れた面を取り除いて詰める
+  const map = new Int32Array(nV).fill(-1); const idx = []; let n = 0;
+  for (let t = 0; t < sm.nT; t++) { const a = ix[t * 3], b = ix[t * 3 + 1], c = ix[t * 3 + 2]; if (a === b || b === c || a === c) continue; for (const v of [a, b, c]) { if (map[v] < 0) map[v] = n++; idx.push(map[v]); } }
+  const pos = new Float32Array(n * 3), mk = new Float32Array(n), pt = new Float32Array(n * 4);
+  for (let v = 0; v < nV; v++) { const m = map[v]; if (m < 0) continue; pos[m * 3] = P[v * 3]; pos[m * 3 + 1] = P[v * 3 + 1]; pos[m * 3 + 2] = P[v * 3 + 2]; mk[m] = sm.mask[v]; for (let k = 0; k < 4; k++) pt[m * 4 + k] = sm.paint[v * 4 + k]; }
+  sm.load({ pos, idx: new Uint32Array(idx), mask: mk, paint: pt }); sm.mesh.geometry = sm.geo;
 }
 function taubin(sm, passes = 2, tangential = false) {
   const out = [0, 0, 0]; const tmp = new Float32Array(sm.nV * 3);
@@ -1254,9 +1346,7 @@ async function makeTextLayer() {
     const sb = new THREE.Box3(); for (const o of state.objects) if (o.mesh.visible) sb.union(worldBox(o));
     const rad = sb.isEmpty() ? 0 : sb.getSize(new V3()).length() / 2;
     const tw = (B.w * h) / 2;
-    rec.mesh.position.copy(sb.isEmpty() ? controls.target : sb.getCenter(new V3())).addScaledVector(right, rad + tw + 6);
-    // face the camera (yaw only)
-    const dir = camera.position.clone().sub(controls.target); rec.mesh.rotation.y = Math.atan2(dir.x, dir.z);
+    rec.mesh.position.set(0, 0, 0); rec.mesh.rotation.set(0, 0, 0); // 原点に、正面向きで置く
     listOp('立体文字', () => { addRec(rec); setActive(rec); });
     fitView(); toast(`立体文字を作りました（${rec.sm.nT.toLocaleString()} 面）`);
   } catch (err) { console.error(err); toast(err.message || String(err), 'err'); }
@@ -1749,6 +1839,20 @@ const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, -6000, 6000);
 let camera = persp; let orthoH = 100;
 camera.position.set(0, 40, 150);
 const floor = new THREE.GridHelper(300, 30, 0x2e343d, 0x22262d); floor.position.y = -40; scene.add(floor);
+// 正面を表す▲（床の手前のふち。正面ボタンで見たときに手前側）
+const frontMark = (() => {
+  const sh = new THREE.Shape(); sh.moveTo(0, 1); sh.lineTo(-0.8, -0.6); sh.lineTo(0.8, -0.6); sh.closePath();
+  const m = new THREE.Mesh(new THREE.ShapeGeometry(sh), new THREE.MeshBasicMaterial({ color: 0xeaa23e, transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2; // 床に寝かせる。先が手前（＋Z）を向く
+  m.position.y = 0.05; floor.add(m); return m;
+})();
+let floorSize = 300; try { const v = +localStorage.getItem('nendo-floor'); if (v >= 50) floorSize = v; } catch {}
+function setFloorSize(sz) {
+  floorSize = sz; const g = new THREE.GridHelper(sz, Math.round(sz / 10), 0x2e343d, 0x22262d); floor.geometry.dispose(); floor.geometry = g.geometry; g.material.dispose();
+  const k = Math.max(4, sz * 0.035); frontMark.scale.set(k, k, 1); frontMark.position.z = sz / 2 + k * 1.1;
+  try { localStorage.setItem('nendo-floor', String(sz)); } catch {}
+}
+setFloorSize(floorSize);
 
 // matcap (clay look, light on phones)
 function makeMatcap(stops, rimA, spec) {
@@ -1811,7 +1915,7 @@ function resize() {
 new ResizeObserver(resize).observe(view);
 
 // ---------- state ----------
-const state = { objects: [], active: null, nextId: 1, sym: [true, false, false], penStr: true, penSize: true, radial: 0, voxRes: 96, stab: 0, cutH: 2, wall: 2, penOnly: false, paintHex: 0xd9534f, inv: false, holdSmooth: false, brush: 'grab', size: 56, str: 40, dyntopo: true, detail: 22, wire: false, zup: true };
+const state = { objects: [], active: null, nextId: 1, sym: [true, false, false], penStr: true, penSize: true, radial: 0, voxRes: 96, stab: 0, cutH: 2, wall: 2, penOnly: false, paintHex: 0xd9534f, inv: false, holdSmooth: false, brush: 'grab', size: 56, str: 40, dyntopo: true, detail: 8, divRound: true, decRatio: 0.5, wire: false, zup: true };
 const sculpt = { sm: null, rec: null, stroke: null, move: null };
 const undoStack = [], redoStack = [];
 
@@ -1910,7 +2014,7 @@ function addPrimitive(kind) {
   const rec = makeRec(g, count ? `${name}${count + 1}` : name, COLORS[state.objects.length % COLORS.length]);
   densify(rec.sm, 30000);
   const right = new V3().setFromMatrixColumn(camera.matrixWorld, 0);
-  rec.mesh.position.copy(controls.target).addScaledVector(right, state.objects.length ? 45 : 0);
+  rec.mesh.position.set(0, 0, 0); // 新しい形は原点に置く（対称の中心とそろう）
   listOp(name + 'を追加', () => { addRec(rec); setActive(rec); });
   toast(name + 'を追加しました');
 }
@@ -1918,7 +2022,27 @@ function addPrimitive(kind) {
 // ---------- layers UI ----------
 const EYE = '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>';
 const EYE_OFF = '<svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 6.1A10.6 10.6 0 0 1 12 6c6.4 0 10 6 10 6a17 17 0 0 1-3 3.6M6.4 6.5C3.7 8.2 2 12 2 12s3.6 6 10 6a9.7 9.7 0 0 0 4.2-.9"/></svg>';
+// ほかのレイヤー（選んでいる以外）の見え方：表示 → 半透明 → 非表示 → 表示…（目のボタンの表示/非表示とは別。書き出しには影響しない）
+state.others = 'show';
+const OTHERS_ICON = {
+  show: '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="9" height="11" rx="2"/><rect x="12" y="5" width="9" height="11" rx="2"/></svg>',
+  ghost: '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="9" height="11" rx="2" stroke-dasharray="2.5 2"/><rect x="12" y="5" width="9" height="11" rx="2"/></svg>',
+  hide: '<svg viewBox="0 0 24 24"><rect x="12" y="5" width="9" height="11" rx="2"/><path d="M3 18L11 6"/></svg>',
+};
+function applyOthers() {
+  for (const r of state.objects) {
+    const m = r.mesh.material; const other = r !== state.active; const mode = other ? state.others : 'show';
+    const vis = mode !== 'hide', tr = mode === 'ghost';
+    if (m.visible !== vis || m.transparent !== tr) { m.visible = vis; m.transparent = tr; m.opacity = tr ? 0.22 : 1; m.depthWrite = !tr; m.needsUpdate = true; }
+  }
+  const b = $('othersBtn'); if (b) { b.dataset.mode = state.others; b.innerHTML = OTHERS_ICON[state.others]; }
+}
+$('othersBtn').onclick = () => {
+  state.others = { show: 'ghost', ghost: 'hide', hide: 'show' }[state.others]; applyOthers();
+  toast({ show: 'ほかのレイヤーを表示しました', ghost: 'ほかのレイヤーを半透明にしました（タップで選べます）', hide: 'ほかのレイヤーを隠しました' }[state.others]);
+};
 function renderLayers() {
+  applyOthers?.();
   const el = $('layerList'); el.innerHTML = '';
   if (!state.objects.length) { el.innerHTML = '<div class="info" style="padding:8px">「＋」で形を追加</div>'; return; }
   for (const r of state.objects.slice().reverse()) {
@@ -2030,7 +2154,9 @@ const ICON = {
   outline: '<path d="M7 5c4-2 9-1 11 2s2 7 0 10-7 4-10 2-6-5-5-8 1-5 4-6z" stroke-dasharray="3 2.2"/><path d="M10 11c1-1 3-1 4 0"/>',
   maskops: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M4 14l6-6 10 10"/>',
 };
-const BRUSHES = [['grab', 'つかむ'], ['draw', '盛る'], ['clay', '粘土'], ['smooth', '滑らか'], ['inflate', '膨らます'], ['flatten', '平ら'], ['pinch', 'つまむ'], ['crease', '筋'], ['move', '移動'], ['mask', 'マスク'], ['lasso', '範囲マスク'], ['paint', '塗る'], ['trim', 'トリム']];
+const BRUSHES = [['grab', 'つかむ'], ['draw', '盛る'], ['clay', '粘土'], ['smooth', '滑らか'], ['inflate', '膨らます'], ['flatten', '平ら'], ['pinch', 'つまむ'], ['crease', '筋'], ['mask', 'マスク'], ['lasso', '範囲マスク'], ['paint', '塗る'], ['trim', 'トリム']];
+try { const v = localStorage.getItem('nendo-divround'); if (v !== null) state.divRound = v === '1'; } catch {}
+const TOOL_DESC = { grab: 'つまんで引っぱり、形を大きく動かす', draw: 'なぞった所を盛り上げる（反転でへこます）', clay: '粘土を貼るように平たく盛る（反転で削る）', inflate: '内側から風船のようにふくらませる', flatten: '表面を平らにならす', pinch: '両側から寄せて角や稜線をシャープに', crease: '細い溝（スジ）を彫る（反転で盛り筋）', mask: '塗った所を守る（ほかのツールで変わらない）', lasso: '囲んだ所をまとめてマスクする', paint: '色を塗る（色は下で選ぶ）', trim: '画面に線を引いて、見ている向きで切る' };
 const TOOL_LIST = () => BRUSHES.filter((b) => b[0] !== 'smooth'); // 「滑らか」は下の専用ボタンだけ
 // 反転したときの名前（反転できないブラシは載せない）
 const INV_NAMES = { paint: '色を消す', draw: 'へこます', clay: '粘土で削る', inflate: '縮ます', pinch: '広げる', crease: '盛り筋', mask: 'マスク消し', lasso: '範囲で消す' };
@@ -2054,6 +2180,7 @@ function paintBrushes() {
   const can = !!INV_NAMES[k];
   paintMaskBtn?.(); renderFavs?.();
   $('invBtn').disabled = !can; $('invBtn').setAttribute('aria-pressed', !!(can && inv));
+  { const base = BRUSHES.find((b2) => b2[0] === k)?.[1]; $('invBtn').textContent = !can ? '反転できません' : inv ? `⇄ ${base}に戻す` : `⇄ ${INV_NAMES[k]}にする`; }
 }
 function selectBrush(k) { if (k !== 'smooth') state.prevBrush = k; state.brush = k; paintBrushes(); }
 function openToolSheet() {
@@ -2062,7 +2189,7 @@ function openToolSheet() {
     for (const [k] of TOOL_LIST()) {
       const w = div('tgw');
       const b = document.createElement('button'); b.className = 'tg' + (state.invB[k] && INV_NAMES[k] ? ' inverted' : ''); b.setAttribute('aria-pressed', state.brush === k);
-      b.innerHTML = `<svg viewBox="0 0 24 24">${ICON[k]}</svg><span>${brushLabel(k)}</span>`;
+      b.innerHTML = `<svg viewBox="0 0 24 24">${ICON[k]}</svg><span class="tx"><b>${brushLabel(k)}</b><small>${TOOL_DESC[k] || ''}</small></span>`;
       b.onclick = () => { selectBrush(k); closeSheet(); };
       const st = document.createElement('button'); st.className = 'star'; const on = favs.includes(k);
       st.textContent = on ? '★' : '☆'; st.setAttribute('aria-pressed', on); st.setAttribute('aria-label', `「${brushLabel(k)}」を左に置く`);
@@ -2104,7 +2231,7 @@ function renderBrushes() {
   const tb = document.createElement('button'); tb.id = 'toolBtn'; tb.className = 'br toolbtn'; tb.setAttribute('aria-label', 'ツールを選ぶ');
   tb.innerHTML = '<span class="ti"></span><span class="tn"></span><svg class="chev" viewBox="0 0 24 24"><path d="M7 15l5-5 5 5"/></svg>';
   tb.onclick = () => { if (state.brush === 'smooth') { selectBrush(state.prevBrush || 'grab'); return; } openToolSheet(); }; el.append(tb);
-  const sm = document.createElement('button'); sm.id = 'smoothBtn'; sm.className = 'br smoothbtn'; sm.setAttribute('aria-label', '滑らか');
+  const sm = document.createElement('button'); sm.id = 'smoothBtn'; sm.className = 'br smoothbtn haspop'; sm.setAttribute('aria-label', '滑らか');
   sm.innerHTML = `<svg viewBox="0 0 24 24">${ICON.smooth}</svg>滑らか`;
   sm.onclick = () => { if (sm._suppress) { sm._suppress = false; return; } selectBrush(state.brush === 'smooth' ? state.prevBrush || 'grab' : 'smooth'); }; el.append(sm);
   attachSmoothHold(sm);
@@ -2131,9 +2258,8 @@ vslider('vsStr', 1, 100, () => state.str, (v) => (state.str = v));
 
 $('invBtn').onclick = () => toggleInvert(state.brush);
 function symLabel() {
-  const ax = ['X', 'Y', 'Z'].filter((_, i) => state.sym[i]).join('');
-  const parts = []; if (ax) parts.push(ax); if (state.radial > 1) parts.push('放射' + state.radial);
-  return parts.length ? '対称 ' + parts.join('・') : '対称なし';
+  const parts = ['左右', '上下', '前後'].filter((_, i) => state.sym[i]); if (state.radial > 1) parts.push('放射' + state.radial);
+  return parts.length ? '対称：' + parts.join('・') : '対称：なし';
 }
 function paintSym() { const b = $('symBtn'); b.textContent = symLabel(); b.setAttribute('aria-pressed', state.sym.some(Boolean) || state.radial > 1); }
 const RADIALS = [0, 2, 3, 4, 5, 6, 8, 12];
@@ -2152,7 +2278,7 @@ function openSymSheet() {
     g2.append(btn('すべて解除', () => { state.sym = [false, false, false]; state.radial = 0; paintSym(); closeSheet(); }));
     g2.append(btn('閉じる', closeSheet));
     s.append(g2);
-    const p = document.createElement('p'); p.className = 'info'; p.textContent = 'XとYを両方選ぶと4か所、XYZすべてで8か所に同時に効きます。放射と組み合わせることもできます。対称の中心は各レイヤーの中心です。'; s.append(p);
+    const p = document.createElement('p'); p.className = 'info'; p.textContent = 'XとYを両方選ぶと4か所、XYZすべてで8か所に同時に効きます。放射と組み合わせることもできます。対称の中心は空間の原点です（新しく作ったレイヤーは原点に置かれるので、どれも同じ場所が中心になります）。'; s.append(p);
   });
 }
 $('symBtn').onclick = openSymSheet;
@@ -2162,12 +2288,12 @@ if (hs) hs.addEventListener('pointerdown', (e) => { state.holdSmooth = true; hs.
 if (hs) for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) hs.addEventListener(ev, () => { state.holdSmooth = false; hs.dataset.active = 'false'; });
 
 // ---------- mesh sheet ----------
-function meshOp(label, fn) {
+function meshOp(label, fn, doneWord) {
   const rec = state.active; if (!rec) return toast('レイヤーを選んでください', 'err');
   const n0 = rec.sm.nT;
   const ok = meshEdit(rec, label, (sm) => { if (fn(sm) === false) return false; sm.computeAllNormals(); sm.upload(true); sm.bvhDirty = true; rec.mesh.geometry = sm.geo; });
   updateTriInfo();
-  if (ok) toast(`${label}しました（${n0 === rec.sm.nT ? '' : n0.toLocaleString() + ' → '}${rec.sm.nT.toLocaleString()} 面）`, 'ok');
+  if (ok) toast(`${doneWord || label + 'しました'}（${n0 === rec.sm.nT ? '' : n0.toLocaleString() + ' → '}${rec.sm.nT.toLocaleString()} 面）`, 'ok');
 }
 function openMeshSheet() {
   openSheet('メッシュ', (s) => {
@@ -2190,7 +2316,19 @@ function openMeshSheet() {
     s.append(note('大きいほど線がまっすぐ安定します。そのぶん、指より少し遅れて付いてきます。0で補正なし。'));
     s.append(h3('全体に適用'));
     let g = div('grid');
-    g.append(btn('細分化<small>面を全部4つに割ります（面の数は4倍）。形はほぼそのままで、少しなめらかになります。<br>使いどき：顔や指先など、細かい彫りを入れる前に全体を細かくしておきたいとき。2〜3回で重くなるので押しすぎに注意</small>', () => { closeSheet(); meshOp('細分化', subdivideAll); }, 'sb wide'));
+    const nowT = state.active ? state.active.sm.liveTris().length : 0; const nextT = nowT * 4;
+    const dv = btn(`細分化（ディバイド）<small>面を全部4つに割ります。今 ${nowT.toLocaleString()} 面 → 押すと <b style="color:${nextT > 300000 ? 'var(--danger)' : 'var(--fg)'}">${nextT.toLocaleString()} 面</b>${nextT > 300000 ? '（スマホでは重くなります）' : ''}<br>使いどき：顔や指先など、細かい彫りを入れる前に全体を細かくしておきたいとき。2〜3回で重くなるので押しすぎに注意</small>`, () => { closeSheet(); meshOp(state.divRound ? '細分化（丸める）' : '細分化', (sm) => subdivideAll(sm)); }, 'sb wide');
+    g.append(dv);
+    const dcText = () => { const nt = Math.round(nowT * state.decRatio); return `面を減らす<small>形の変化が小さい所（平らな所など）から面をまとめます。細かく彫った所や角は残りやすく、マスクと塗った色も残ります。今 ${nowT.toLocaleString()} 面 → 押すと 約${nt.toLocaleString()} 面<br>使いどき：彫っているうちに面が増えて重くなったとき。細分化しすぎたとき</small>`; };
+    const dc = btn(dcText(), () => { closeSheet(); toast('面を減らしています…（面が多いと数秒かかります）'); setTimeout(() => meshOp('面を減らす', (sm) => decimate(sm, state.decRatio), '面を減らしました'), 50); }, 'sb wide');
+    g.append(dc);
+    const dg = div('grid'); dg.style.gridColumn = '1 / -1';
+    const dbs = [[0.5, '半分に'], [0.25, '1/4に'], [0.1, '1/10に']].map(([r, n]) => { const b = btn(n, () => { state.decRatio = r; dbs.forEach((x, i) => x.setAttribute('aria-pressed', [0.5, 0.25, 0.1][i] === r)); dc.innerHTML = dcText(); }); b.setAttribute('aria-pressed', state.decRatio === r); return b; });
+    dbs.forEach((b) => dg.append(b)); g.append(dg);
+    const dr = document.createElement('label'); dr.className = 'check'; dr.style.gridColumn = '1 / -1'; dr.style.minHeight = '36px';
+    dr.innerHTML = `<input type="checkbox" ${state.divRound ? 'checked' : ''}> 割るときに丸める（角がとれて全体がなめらかになる。マスクした所は形を保つ）`;
+    dr.querySelector('input').onchange = (e) => { state.divRound = e.target.checked; try { localStorage.setItem('nendo-divround', state.divRound ? '1' : '0'); } catch {} };
+    g.append(dr);
     g.append(btn('均一化<small>大きく伸びた面だけを割って、面の大きさを揃えます。粗い所だけ増えるので、細分化ほど重くなりません。<br>使いどき：「つかむ」や「移動」で引っぱった所が粗くなり、彫るとガタガタするとき</small>', () => { closeSheet(); meshOp('均一化', remesh); }, 'sb wide'));
     s.append(g);
     s.append(h3('3Dプリント用'));
@@ -2263,7 +2401,7 @@ function hitRec(rec, e) {
 }
 function pickAnyRec(e) {
   let best = null, bd = Infinity;
-  for (const r of state.objects) { const h = hitRec(r, e); if (h) { const d = h.point.clone().applyMatrix4(r.mesh.matrixWorld).distanceTo(camera.position); if (d < bd) { bd = d; best = r; } } }
+  for (const r of state.objects) { if (!r.mesh.material.visible) continue; const h = hitRec(r, e); if (h) { const d = h.point.clone().applyMatrix4(r.mesh.matrixWorld).distanceTo(camera.position); if (d < bd) { bd = d; best = r; } } }
   return best;
 }
 function localRadius(hitLocal, sizePx) {
@@ -2271,7 +2409,8 @@ function localRadius(hitLocal, sizePx) {
   const sc = (Math.abs(m.scale.x) + Math.abs(m.scale.y) + Math.abs(m.scale.z)) / 3;
   return ((sizePx / 2) * worldPerPixel(w)) / sc;
 }
-function mirrors() {
+// 対称：空間の原点（0,0,0）を通る面で鏡写し。レイヤーの位置に関係なく、どのレイヤーでも同じ場所が中心になる
+function mirrors(rec = sculpt.rec) {
   let list = [new THREE.Matrix4()];
   state.sym.forEach((on, i) => { if (!on) return; const S = new THREE.Matrix4().makeScale(i === 0 ? -1 : 1, i === 1 ? -1 : 1, i === 2 ? -1 : 1); list = list.concat(list.map((m) => S.clone().multiply(m))); });
   if (state.radial > 1) {
@@ -2279,7 +2418,9 @@ function mirrors() {
     for (let k = 0; k < state.radial; k++) { const Rk = new THREE.Matrix4().makeRotationY((k / state.radial) * Math.PI * 2); for (const m of list) out.push(Rk.clone().multiply(m)); }
     list = out;
   }
-  return list;
+  if (!rec || list.length === 1) return list;
+  rec.mesh.updateMatrixWorld(true); const W = rec.mesh.matrixWorld, Wi = W.clone().invert();
+  return list.map((m) => Wi.clone().multiply(m).multiply(W)); // 世界での鏡写しを、レイヤーの中の座標に直す
 }
 function afterDabs(touched, R) {
   const sm = sculpt.sm; let topo = false; const nVb = sm.nV;
@@ -2348,7 +2489,7 @@ function strokeMove(e) {
       const loc = w.clone().applyMatrix4(sculpt.rec.mesh.matrixWorld.clone().invert());
       const d = loc.clone().sub(st.prevLocal); st.prevLocal = loc;
       const p = sculpt.sm.pos; const touched = [];
-      for (const g of st.grabs) { const dd = d.clone().applyMatrix4(g.m); const dx = dd.x, dy = dd.y, dz = dd.z; for (const [v, wv] of g.map) { p[v * 3] += dx * wv; p[v * 3 + 1] += dy * wv; p[v * 3 + 2] += dz * wv; touched.push(v); } }
+      for (const g of st.grabs) { const dd = d.clone().applyMatrix3(g.m3 || (g.m3 = new THREE.Matrix3().setFromMatrix4(g.m))); const dx = dd.x, dy = dd.y, dz = dd.z; for (const [v, wv] of g.map) { p[v * 3] += dx * wv; p[v * 3 + 1] += dy * wv; p[v * 3 + 2] += dz * wv; touched.push(v); } }
       afterDabs(touched, st.R); continue;
     }
     let tx = ev.clientX, ty = ev.clientY;
@@ -2660,6 +2801,10 @@ $('menuBtn').onclick = () => openSheet('メニュー', (s) => {
   const fl = btn('床を表示', () => { floor.visible = !floor.visible; fl.setAttribute('aria-pressed', floor.visible); }); fl.setAttribute('aria-pressed', floor.visible); gm.append(fl);
   gm.append(btn('画像で保存 (PNG)', () => { closeSheet(); savePNG(); }));
   s.append(gm);
+  s.append(h3('床の大きさ（1マス＝1cm。▲が正面）'));
+  const gf = div('grid');
+  const fbs = [[100, '10cm'], [200, '20cm'], [300, '30cm'], [500, '50cm'], [1000, '1m']].map(([v, n]) => { const b = btn(n, () => { setFloorSize(v); fbs.forEach((x, i) => x.setAttribute('aria-pressed', [100, 200, 300, 500, 1000][i] === v)); }); b.setAttribute('aria-pressed', floorSize === v); return b; });
+  fbs.forEach((b) => gf.append(b)); s.append(gf);
   s.append(h3('画質（低いほど軽い）'));
   const gq = div('grid'); const qb = [['low', '軽さ優先'], ['std', '標準'], ['high', 'きれい']].map(([k, n]) => { const b = btn(n, () => { setQuality(k); qb.forEach((x, i) => x.setAttribute('aria-pressed', ['low', 'std', 'high'][i] === k)); }); b.setAttribute('aria-pressed', quality === k); return b; });
   qb.forEach((b) => gq.append(b)); s.append(gq);
@@ -2672,7 +2817,7 @@ $('menuBtn').onclick = () => openSheet('メニュー', (s) => {
   s.append(g2);
   s.append(h3('操作'));
   const k = div('keys');
-  k.innerHTML = '<b>1本指</b><span>物体の上：彫る／物体の外：視点を回す</span><b>2本指</b><span>ピンチで拡大縮小、ドラッグで平行移動</span><b>2本指タップ</b><span>元に戻す</span><b>タップ</b><span>ほかの物体をタップで選択</span><b>滑らか</b><span>下の「滑らか」で切り替え。もう一度押すか「ツール」を押すと元のツールに戻る。長押しすると「全体を滑らかに」</span><b>ツールを反転</b><span>盛る⇔へこます、膨らます⇔縮ます など。ツールごとに覚えます</span><b>パース／平行</b><span>左上のボタンで遠近感あり・なしを切り替え</span><b>押して回す</b><span>右下の丸いボタンを押したままドラッグで視点を回す</span><b>正面</b><span>左上のボタンで正面から見る</span><b>中心</b><span>押してから形をタップすると、そこを中心に回る</span><b>マスク（左）</b><span>押すとマスクで塗るモード。マスクがあるときは「全解除」になる。長押しで範囲マスク・反転も選べる</span><b>ペン専用</b><span>ペンだけで彫り、指は視点の操作だけ。手のひらが触れても彫れません</span><b>目のボタン（上）</b><span>ツールやレイヤーを隠して画面を広く使う。もう一度押すと戻る</span><b>ペン</b><span>筆圧で強さと大きさが変わります</span>';
+  k.innerHTML = '<b>右下の小さな三角</b><span>そのボタンは長押しでメニューが出ます（正面・中心・滑らか・マスク）</span><b>1本指</b><span>物体の上：彫る／物体の外：視点を回す</span><b>2本指</b><span>ピンチで拡大縮小、ドラッグで平行移動</span><b>2本指タップ</b><span>元に戻す</span><b>タップ</b><span>ほかの物体をタップで選択</span><b>滑らか</b><span>下の「滑らか」で切り替え。もう一度押すか「ツール」を押すと元のツールに戻る。長押しすると「全体を滑らかに」</span><b>ツールを反転</b><span>盛る⇔へこます、膨らます⇔縮ます など。ツールごとに覚えます</span><b>パース／平行</b><span>左上のボタンで遠近感あり・なしを切り替え</span><b>押して回す</b><span>右下の丸いボタンを押したままドラッグで視点を回す</span><b>正面</b><span>左上のボタンで正面から見る</span><b>レイヤーの窓の重なった四角</b><span>選んでいる以外のレイヤーを、押すたびに 表示→半透明→非表示 に切り替え</span><b>中心</b><span>押してから形をタップすると、そこを中心に回る。長押しで「原点に戻す」「全体の真ん中」なども選べる</span><b>マスク（左）</b><span>押すとマスクで塗るモード。マスクがあるときは「全解除」になる。長押しで範囲マスク・反転も選べる</span><b>ペン専用</b><span>ペンだけで彫り、指は視点の操作だけ。手のひらが触れても彫れません</span><b>目のボタン（上）</b><span>ツールやレイヤーを隠して画面を広く使う。もう一度押すと戻る</span><b>ペン</b><span>筆圧で強さと大きさが変わります</span>';
   s.append(k);
   const p = document.createElement('p'); p.className = 'info'; p.textContent = '作業は1回彫るごとに、この端末のこのブラウザへ自動で保存されます（アプリを切り替えたときや閉じたときにも保存）。元に戻すの履歴は保存されません。別の端末やブラウザに移すとき、念のための控えを残すときは「保存 (.json)」を使ってください。'; s.append(p);
 });
@@ -2722,7 +2867,7 @@ function newScene(withUndo) {
   for (const r of state.objects) scene.remove(r.mesh);
   state.objects = [];
   const base = makeRec(primitive('plane').g, '台', COLORS[7]); densify(base.sm, 12000); base.mesh.position.set(0, -30, 0); addRec(base);
-  const head = makeRec(primitive('sphere').g, '粘土', COLORS[0]); densify(head.sm, 30000); addRec(head);
+  const head = makeRec(primitive('sphere').g, '本体', COLORS[0]); densify(head.sm, 30000); addRec(head);
   setActive(head);
   camera.position.set(0, 25, 150); controls.target.set(0, -2, 0); controls.update(); fitView();
   if (withUndo) { const after = listSnap(), aa = state.active; pushUndo('新しく始める', { undo: () => listRestore(before, ab), redo: () => listRestore(after, aa) }); }
@@ -3010,7 +3155,39 @@ try { if (localStorage.getItem('nendo-pen')) { state.penOnly = true; $('penBtn')
 
 // ---------- rotation pivot ----------
 const pivotPick = { on: false };
-$('pivotBtn').onclick = () => { pivotPick.on = !pivotPick.on; $('pivotBtn').setAttribute('aria-pressed', pivotPick.on); if (pivotPick.on) toast('回転の中心にしたい所をタップ'); };
+function togglePivotPick() { pivotPick.on = !pivotPick.on; $('pivotBtn').setAttribute('aria-pressed', pivotPick.on); if (pivotPick.on) toast('回転の中心にしたい所をタップ'); }
+// 回転の中心をなめらかに移す（見た目の向き・距離はそのまま）
+function movePivotTo(p, msg) {
+  const off = p.clone().sub(controls.target); const from = controls.target.clone(), camFrom = camera.position.clone(); const t0 = performance.now();
+  const step = () => { const k = Math.min(1, (performance.now() - t0) / 250); const e2 = 1 - (1 - k) ** 3; controls.target.copy(from).addScaledVector(off, e2); camera.position.copy(camFrom).addScaledVector(off, e2); controls.update(); if (k < 1) requestAnimationFrame(step); };
+  step(); if (msg) toast(msg);
+}
+function pivotAction(k) {
+  pivotPick.on = false; $('pivotBtn').setAttribute('aria-pressed', false);
+  if (k === 'origin') return movePivotTo(new V3(0, 0, 0), '回転の中心を原点に戻しました');
+  const box = new THREE.Box3();
+  if (k === 'active') { if (!state.active) return toast('レイヤーを選んでください', 'err'); box.copy(worldBox(state.active)); }
+  else for (const r of state.objects) if (r.mesh.visible) box.union(worldBox(r));
+  if (box.isEmpty()) return toast('表示している形がありません', 'err');
+  movePivotTo(box.getCenter(new V3()), k === 'active' ? `回転の中心を「${state.active.name}」の真ん中にしました` : '回転の中心を全体の真ん中にしました');
+}
+(() => { // 短く押す：タップで中心を指定／長押し：メニュー
+  const b = $('pivotBtn'), pop = $('pivotPop'); let st = null, suppress = false;
+  const itemAt = (x, y) => { const el = document.elementFromPoint(x, y); return el && el.closest ? el.closest('#pivotPop [data-pv]') : null; };
+  const mark = (it) => pop.querySelectorAll('[data-pv]').forEach((x) => x.classList.toggle('hot', x === it));
+  b.addEventListener('pointerdown', (e) => { st = { open: false }; try { b.setPointerCapture(e.pointerId); } catch {} st.tm = setTimeout(() => { if (st) { st.open = true; pop.hidden = false; mark(null); navigator.vibrate?.(10); } }, 420); e.preventDefault(); });
+  b.addEventListener('pointermove', (e) => { if (st?.open) mark(itemAt(e.clientX, e.clientY)); });
+  const up = (e, cancel) => {
+    if (!st) return; clearTimeout(st.tm); const s0 = st; st = null; mark(null);
+    if (!s0.open) { if (!cancel) togglePivotPick(); return; }
+    suppress = true; setTimeout(() => (suppress = false), 300);
+    const it = !cancel && itemAt(e.clientX, e.clientY); if (it) { pop.hidden = true; pivotAction(it.dataset.pv); }
+  };
+  b.addEventListener('pointerup', (e) => up(e, false)); b.addEventListener('pointercancel', (e) => up(e, true));
+  b.onclick = (e) => e.preventDefault();
+  pop.querySelectorAll('[data-pv]').forEach((x) => (x.onclick = () => { if (suppress) return; pop.hidden = true; pivotAction(x.dataset.pv); }));
+  document.addEventListener('pointerdown', (e) => { if (!pop.hidden && !pop.contains(e.target) && e.target !== b && !b.contains(e.target)) pop.hidden = true; });
+})();
 function pickPivot(e) {
   pivotPick.on = false; $('pivotBtn').setAttribute('aria-pressed', false);
   let best = null, bd = Infinity;
@@ -3374,11 +3551,11 @@ $('outSmoothNow').onclick = () => {
 };
 function startOutline() {
   if (state.tf) setTf(false); if (placing.on) stopPlacing(); if (trim.on) endTrim();
-  outline.on = true; outline.last = null; $('outAfter').hidden = true; $('outEnd').textContent = 'やめる';
+  outline.on = true; outline.last = null; $('outAfter').hidden = true; $('outEnd').textContent = 'やめる'; $('outEnd').classList.remove('done');
   $('outBar').hidden = false; $('quick').hidden = true; $('ring').hidden = true;
   $('outMsg').textContent = outline.grow ? '1本指で輪郭をぐるっと描く。形の上に描くとそこから生えます' : '1本指で輪郭をぐるっと描く。画面の中心の奥行きに、新しい形ができます';
 }
-function endOutline() { outline.on = false; outline.last = null; $('outBar').hidden = true; $('quick').hidden = false; lasso.pts = []; drawLasso(); $('outEnd').textContent = 'やめる'; }
+function endOutline() { outline.on = false; outline.last = null; $('outBar').hidden = true; $('quick').hidden = false; lasso.pts = []; drawLasso(); $('outEnd').textContent = 'やめる'; $('outEnd').classList.remove('done'); }
 $('outEnd').onclick = endOutline;
 for (const [id, key] of [['outPuff', 'puff'], ['outBump', 'bump']]) {
   $(id).addEventListener('input', (e) => { outline[key] = +e.target.value; $(id + 'O').textContent = (+e.target.value).toFixed(2); });
@@ -3447,11 +3624,12 @@ function rebuildOutline() {
   }, 30);
 }
 function afterOutline(rec, input) {
+  if (state.sym.some(Boolean) || state.radial > 1) { state.sym = [false, false, false]; state.radial = 0; paintSym(); setTimeout(() => toast('輪郭から作った形は原点にないので、対称をオフにしました'), 2200); }
   outline.last = { rec, input, target: input.target };
   const t = input.target;
   $('outAfter').hidden = false; $('outMerge').hidden = !t;
   if (t) $('outMerge').innerHTML = `「${t.name}」と足す<small>くっつけて1つに（面は張りなおし）</small>`;
-  outline.on = false; $('outEnd').textContent = '完了'; // 1つ作ったら描くのは終わり（パネルは調整用に残す）
+  outline.on = false; $('outEnd').textContent = '✓ 完了'; $('outEnd').classList.add('done'); // 1つ作ったら描くのは終わり（パネルは調整用に残す）
   $('outMsg').textContent = 'できました。設定を動かすと今の形を作り直します。終わったら「完了」';
   toast(`「${rec.name}」を作りました（${rec.sm.nT.toLocaleString()} 面）${t ? `。「${t.name}」から生えています` : ''}`, 'ok');
 }
