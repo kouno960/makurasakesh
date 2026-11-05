@@ -112,6 +112,10 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 #placeAdj input[type="range"] { flex: 1; min-width: 0; accent-color: var(--accent); height: 34px; }
 #placeAdj output { font-family: var(--font-num); width: 58px; text-align: right; }
 #placeAdj .prow > button { flex: 1; }
+#placeAdj button[aria-pressed="true"] { border-color: var(--cool); color: var(--cool); background: color-mix(in srgb, var(--cool) 16%, var(--panel-solid)); }
+#placeAdj .prow > button { white-space: nowrap; font-size: 12px; padding: 0 6px; }
+#placeBar #plGo { flex: 1.8; height: auto; min-height: 40px; white-space: normal; line-height: 1.3; padding: 4px 8px; }
+#plMode.out { border-color: var(--accent); color: var(--accent); }
 #placeAdj .sm { flex: 0 0 auto !important; padding: 0 10px !important; font-family: var(--font-num); }
 #placeBar button.go { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
 #placeBar button { flex: 0 0 auto; height: 40px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--line); background: var(--raise); cursor: pointer; }
@@ -210,7 +214,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .tfgrid input { width: 100%; min-width: 0; height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); padding: 0 8px; font-family: var(--font-num); font-size: 16px; -webkit-user-select: text; user-select: text; }
 
 #top { grid-row: 1; } #params { grid-row: 2; } #view { grid-row: 3; } #bar { grid-row: 4; }
-#app.clean #bar, #app.clean #layers, #app.clean #quick, #app.clean #frontBtn, #app.clean #projBtn, #app.clean #pivotBtn, #app.clean #maskBtn, #app.clean #favs, #app.clean #maskPop, #app.clean #pivotPop, #app.clean #orbitPad, #app.clean #params, #app.clean #hint, #app.clean #tfWrap, #app.clean #trimWrap, #app.clean #ltBar, #app.clean #outBar { display: none !important; }
+#app.clean #bar, #app.clean #layers, #app.clean #quick, #app.clean #frontBtn, #app.clean #projBtn, #app.clean #pivotBtn, #app.clean #maskBtn, #app.clean #favs, #app.clean #maskPop, #app.clean #symRings, #app.clean #pivotPop, #app.clean #orbitPad, #app.clean #params, #app.clean #hint, #app.clean #tfWrap, #app.clean #trimWrap, #app.clean #ltBar, #app.clean #outBar { display: none !important; }
 #cleanBtn[aria-pressed="true"] { color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); }
 .symgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .symgrid .sb { min-height: 56px; font-size: 15px; }
@@ -285,6 +289,10 @@ input.sw::-webkit-color-swatch-wrapper { padding: 0; } input.sw::-webkit-color-s
 #ring { position: absolute; pointer-events: none; border: 1.5px solid var(--accent); border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 1px rgba(0,0,0,.4); }
 #ring.inv { border-color: var(--cool); }
 #ring.smooth { border-style: dashed; border-color: var(--fg); }
+#symRings { position: absolute; inset: 0; pointer-events: none; }
+#symRings div { position: absolute; border: 1.5px solid var(--accent); border-radius: 50%; transform: translate(-50%, -50%); opacity: .75; }
+#symRings div.back { border-style: dashed; opacity: .3; }
+#symRings div.inv { border-color: var(--cool); }
 #toast { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); max-width: calc(100% - var(--layers-w) - 90px); background: var(--panel-solid); border: 1px solid var(--line); border-radius: 10px; padding: 7px 12px; font-size: 12px; pointer-events: none; transition: opacity .25s; text-align: center; }
 #toast.err { border-color: var(--danger); }
 #toast.ok { border-color: var(--cool); color: var(--cool); }
@@ -410,10 +418,11 @@ input.sw::-webkit-color-swatch-wrapper { padding: 0; } input.sw::-webkit-color-s
       <div id="placeAdj" hidden>
         <div class="prow"><label for="plSize">大きさ</label><input type="range" id="plSize" min="-100" max="100" step="1" value="0"><output id="plSizeO"></output></div>
         <div class="prow"><label for="plRot">回転</label><input type="range" id="plRot" min="-180" max="180" step="1" value="0"><output id="plRotO"></output></div>
+        <div class="prow"><button id="plFlipH" aria-pressed="false" aria-label="左右反転">⇆ 左右</button><button id="plFlipV" aria-pressed="false" aria-label="上下反転">⇅ 上下</button><button id="plMode">彫る（凹）</button></div>
         <div class="prow"><button class="sm" id="plRotM" aria-label="左に90度回す">⟲90°</button><button class="sm" id="plRotP" aria-label="右に90度回す">90°⟳</button><button id="plReset">戻す</button><button id="plGo" class="go">ここに彫る（凹）</button></div>
       </div>
     </div>
-    <div id="ring" hidden></div>
+    <div id="ring" hidden></div><div id="symRings"></div>
     <div id="toast" style="opacity:0"></div>
   </main>
 
@@ -442,6 +451,7 @@ input.sw::-webkit-color-swatch-wrapper { padding: 0; } input.sw::-webkit-color-s
 <div id="scrim" hidden></div>
 <div id="sheet" hidden role="dialog" aria-modal="true"></div>
 <input type="file" id="fileIn" hidden>
+<input type="file" id="imgIn" accept="image/*" hidden>
 
 <script type="importmap">
 { "imports": {
@@ -1357,21 +1367,52 @@ const placing = { on: false, B: null };
 async function startPlacing() {
   const text = textOpt.text.trim(); if (!text) return toast('文字を入力してください', 'err');
   if (!state.active) return toast('彫るレイヤーを選んでください', 'err');
-  const B = softenBitmap(await textBitmap(text, textOpt.font, textOpt.bold, 160), textOpt.soft);
+  const Braw = await textBitmap(text, textOpt.font, textOpt.bold, 160);
+  const B = softenBitmap(flipBitmap(Braw, stampSt.flipH, stampSt.flipV), textOpt.soft);
   if (!B) return toast('文字が描けませんでした', 'err');
-  resetTextPreview(); placing.on = true; placing.B = B; placing.drag = false; placing.pending = false; placing.hit = null; placing.k = 1; placing.ang = 0; $('placeAdj').hidden = true; $('quick').hidden = true;
+  resetTextPreview(); placing.on = true; placing.B = B; placing.Braw = Braw; placing.drag = false; placing.pending = false; placing.hit = null; placing.k = 1; placing.ang = 0; $('placeAdj').hidden = true; $('quick').hidden = true;
   $('placeBar').hidden = false;
   $('placeMsg').textContent = `「${state.active.name}」の上に指を置くと位置が表示されます。指を離したあと、大きさと回転を調整して「ここに${textOpt.mode === 'engrave' ? '彫る（凹）' : '出す（凸）'}」`;
 }
 function stopPlacing() { placing.on = false; placing.B = null; placing.drag = false; placing.pending = false; placing.hit = null; $('placeAdj').hidden = true; resetTextPreview(); $('placeBar').hidden = true; $('quick').hidden = false; }
 $('placeCancel').onclick = stopPlacing;
+// 対称がオンのとき、原点をはさんだ反対側の置き場所（鏡写しの向き）。彫る前の表面で決める
+function symFrames(rec, F0) {
+  const out = []; const Ms = mirrors(rec); if (Ms.length < 2) return out;
+  const sm = rec.sm; if (sm.bvhDirty || !sm.bvh) sm.buildBVH(); const { Hl, Wl, sc } = F0; const all = [F0];
+  for (let k = 1; k < Ms.length; k++) {
+    const M = Ms[k], L3 = new THREE.Matrix3().setFromMatrix4(M);
+    const c2 = F0.c.clone().applyMatrix4(M); const hit2 = sm.bvh.closestPointToPoint(c2, {}); if (!hit2 || hit2.distance > Hl * 0.6) continue;
+    const cc = hit2.point.clone(); if (all.some((f) => f.c.distanceTo(cc) < Math.max(Wl, Hl) * 0.3)) continue; // 対称面の上なら重ねない
+    const g0 = sm.gather(cc, Math.max(Hl, Wl) * 0.3, false); const n2 = new V3(); for (const v of g0.ids) n2.add(new V3(sm.nrm[v * 3], sm.nrm[v * 3 + 1], sm.nrm[v * 3 + 2]));
+    if (n2.lengthSq() < 1e-9) n2.copy(F0.n).applyMatrix3(L3); n2.normalize();
+    const r2 = F0.r.clone().applyMatrix3(L3); r2.sub(n2.clone().multiplyScalar(r2.dot(n2))).normalize();
+    const u2 = F0.up.clone().applyMatrix3(L3); u2.sub(n2.clone().multiplyScalar(u2.dot(n2))).sub(r2.clone().multiplyScalar(u2.dot(r2))).normalize(); // 鏡写しの向きのまま
+    const f = { Hl, Wl, sc, c: cc, n: n2, r: r2, up: u2 }; out.push(f); all.push(f);
+  }
+  return out;
+}
+// プレビューのカードを1枚置く（鏡写しの向きにも対応）
+function placeCard(m, f) {
+  const mir = f.r.clone().cross(f.up).dot(f.n) < 0; const rr = mir ? f.r.clone().negate() : f.r;
+  m.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(rr, f.up, f.n)); m.position.copy(f.c).addScaledVector(f.n, f.Hl * 0.02); m.scale.set(mir ? -f.Wl : f.Wl, f.Hl, 1); m.visible = true;
+}
+// 対称の反対側にも、鏡写しのプレビューを出す
+function drawSymPreviews(rec, F0) {
+  const fs = symFrames(rec, F0); textPrev.extra = textPrev.extra || [];
+  while (textPrev.extra.length < fs.length) { const c = textPrev.mesh.clone(); c.material = textPrev.mesh.material; textPrev.extra.push(c); }
+  textPrev.extra.forEach((c, i) => { if (i < fs.length) { if (c.parent !== rec.mesh) rec.mesh.add(c); placeCard(c, fs[i]); } else c.visible = false; });
+}
 function placeText(hit, camR) {
   const rec = state.active; const B = placing.B; if (!rec || !B) return false;
   if (!hit) { toast('形の上をタップしてください', 'err'); return false; }
-  const sm = rec.sm; const before = sm.beginEdit();
-  const { Hl, Wl, sc, c, n, r, up } = textFrame(rec, B, hit, camR);
+  const sm = rec.sm;
+  const F0 = textFrame(rec, B, hit, camR); const { Hl, Wl, sc } = F0;
   const depth = (textOpt.stampDepth / sc) * (textOpt.mode === 'engrave' ? -1 : 1);
   const radius = Math.hypot(Wl, Hl) / 2;
+  const frames = [F0, ...symFrames(rec, F0)];
+  const before = sm.beginEdit(); let movedAll = 0;
+  for (const { c, n, r, up } of frames) {
   // densify: a moderate mesh over the whole stamp, and a much finer mesh only along the letter edges
   const maxZ0 = Math.max(Hl * 0.45, Math.abs(depth) * 3);
   const alphaAt = (v) => {
@@ -1413,11 +1454,12 @@ function placeText(hit, camR) {
     for (const [v, d] of nd) disp.set(v, d);
   }
   for (const [v, d] of disp) { if (Math.abs(d) < 1e-7) continue; const i = v * 3; sm.jv?.(v); p[i] += n.x * d; p[i + 1] += n.y * d; p[i + 2] += n.z * d; moved.push(v); }
-  if (window.__dbg) console.log('DBG g=' + g.ids.length + ' disp=' + disp.size + ' moved=' + moved.length + ' nV=' + sm.nV + ' nVb=' + nVb + ' L=' + L.toFixed(3) + ' Hl=' + Hl.toFixed(2));
-  if (!moved.length) { toast('ここには入りませんでした', 'err'); return false; }
+  movedAll += moved.length; sm.computeAllNormals();
+  }
+  if (!movedAll) { sm.endEdit(before); toast('ここには入りませんでした', 'err'); return false; }
   sm.computeAllNormals(); sm.upload(true); sm.bvhDirty = true; rec.mesh.geometry = sm.geo;
   const lb = placing.label || '文字'; pushUndo(textOpt.mode === 'engrave' ? lb + 'を彫る（凹）' : lb + 'を出す（凸）', diffEntry(rec, sm.endEdit(before)));
-  updateTriInfo(); toast((placing.label || '文字') + (textOpt.mode === 'engrave' ? 'を彫りました（凹）' : 'を出しました（凸）'));
+  updateTriInfo(); toast((placing.label || '文字') + (textOpt.mode === 'engrave' ? 'を彫りました（凹）' : 'を出しました（凸）') + (frames.length > 1 ? `（対称で${frames.length}か所）` : ''));
   $('placeMsg').textContent = '続けて入れるときは、また形の上に指を置いてください。終わったら「やめる」';
   return true;
 }
@@ -1498,11 +1540,10 @@ function showTextPreview(e) {
     if (hit) { placing.hit = { point: hit.point.clone(), face: { normal: hit.face.normal.clone() } }; placing.camR = camRightLocal(rec); }
     ensurePrevMesh(B);
     const m = textPrev.mesh;
-    if (!hit) { m.visible = false; $('placeMsg').textContent = '形の上に指を置くと、入る位置が表示されます'; return; }
+    if (!hit) { m.visible = false; for (const c of textPrev.extra || []) c.visible = false; $('placeMsg').textContent = '形の上に指を置くと、入る位置が表示されます'; return; }
     if (m.parent !== rec.mesh) rec.mesh.add(m);
     const f = textFrame(rec, B, placing.hit || hit, placing.camR);
-    const basis = new THREE.Matrix4().makeBasis(f.r, f.up, f.n);
-    m.quaternion.setFromRotationMatrix(basis); m.position.copy(f.c).addScaledVector(f.n, f.Hl * 0.02); m.scale.set(f.Wl, f.Hl, 1); m.visible = true;
+    placeCard(m, f); drawSymPreviews(rec, f);
     $('placeMsg').textContent = '指を離すとここに置きます（まだ彫りません。2本指で視点を変えられます）';
   });
 }
@@ -1519,7 +1560,7 @@ function redrawPending() {
   const rec = state.active, B = placing.B; if (!rec || !B || !placing.hit) return; ensurePrevMesh(B); const m = textPrev.mesh;
   if (m.parent !== rec.mesh) rec.mesh.add(m);
   const f = textFrame(rec, B, placing.hit, placing.camR);
-  m.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(f.r, f.up, f.n)); m.position.copy(f.c).addScaledVector(f.n, f.Hl * 0.02); m.scale.set(f.Wl, f.Hl, 1); m.visible = true;
+  placeCard(m, f); drawSymPreviews(rec, f);
 }
 function paintPlaceAdj() {
   $('plSize').value = Math.round(Math.log2(placing.k || 1) * 50); $('plSizeO').textContent = (textOpt.stampH * (placing.k || 1)).toFixed(1) + 'mm';
@@ -1529,8 +1570,24 @@ function setPending() {
   if (!placing.hit) { hideTextPreview(); return; }
   placing.pending = true; $('placeAdj').hidden = false; paintPlaceAdj(); redrawPending();
   $('placeMsg').textContent = `大きさ・回転を合わせて「ここに${textOpt.mode === 'engrave' ? '彫る（凹）' : '出す（凸）'}」。形の上をなぞると位置を直せます`;
-  $('plGo').textContent = textOpt.mode === 'engrave' ? 'ここに彫る（凹）' : 'ここに出す（凸）';
+  paintPlaceOpts();
 }
+function paintPlaceOpts() {
+  const eng = textOpt.mode === 'engrave';
+  $('plGo').textContent = eng ? 'ここに彫る（凹）' : 'ここに出す（凸）';
+  $('plMode').textContent = eng ? '凹 彫る' : '凸 出す'; $('plMode').classList.toggle('out', !eng);
+  $('plFlipH').setAttribute('aria-pressed', stampSt.flipH); $('plFlipV').setAttribute('aria-pressed', stampSt.flipV);
+  if (placing.pending) $('placeMsg').textContent = `大きさ・回転・向きを合わせて「ここに${eng ? '彫る（凹）' : '出す（凸）'}」。形の上をなぞると位置を直せます`;
+}
+// プレビュー中に反転・彫る/出すを変えたら、見本を作り直す
+function rebuildPlacing() {
+  if (!placing.on || !placing.Braw) return;
+  const B = softenBitmap(flipBitmap(placing.Braw, stampSt.flipH, stampSt.flipV), textOpt.soft); if (!B) return;
+  placing.B = B; resetTextPreview(); if (placing.pending) redrawPending(); paintPlaceOpts();
+}
+$('plFlipH').onclick = () => { stampSt.flipH = !stampSt.flipH; rebuildPlacing(); };
+$('plFlipV').onclick = () => { stampSt.flipV = !stampSt.flipV; rebuildPlacing(); };
+$('plMode').onclick = () => { textOpt.mode = textOpt.mode === 'engrave' ? 'emboss' : 'engrave'; rebuildPlacing(); toast(textOpt.mode === 'engrave' ? '彫る（凹）にしました' : '出す（凸）にしました'); };
 $('plSize').addEventListener('input', (e) => { placing.k = 2 ** (+e.target.value / 50); paintPlaceAdj(); redrawPending(); });
 $('plRot').addEventListener('input', (e) => { let a = +e.target.value; for (const s of [-180, -135, -90, -45, 0, 45, 90, 135, 180]) if (Math.abs(a - s) <= 3) a = s; placing.ang = a; paintPlaceAdj(); redrawPending(); });
 const rotBy = (d) => { let a = (placing.ang || 0) + d; if (a > 180) a -= 360; if (a < -180) a += 360; placing.ang = a; paintPlaceAdj(); redrawPending(); };
@@ -1544,8 +1601,9 @@ $('plGo').onclick = () => {
 function hideTextPreview() {
   if (textPrev.raf) { cancelAnimationFrame(textPrev.raf); textPrev.raf = 0; }
   if (textPrev.mesh) { textPrev.mesh.visible = false; textPrev.mesh.parent?.remove(textPrev.mesh); }
+  for (const c of textPrev.extra || []) { c.visible = false; c.parent?.remove(c); }
 }
-function resetTextPreview() { hideTextPreview(); if (textPrev.mesh) { textPrev.tex?.dispose(); textPrev.mesh.material.dispose(); textPrev.mesh = null; } }
+function resetTextPreview() { hideTextPreview(); textPrev.extra = []; if (textPrev.mesh) { textPrev.tex?.dispose(); textPrev.mesh.material.dispose(); textPrev.mesh = null; } }
 
 // soften the letter edges a little so the walls become smooth slopes instead of a staircase
 function softenBitmap(B, r) {
@@ -1603,7 +1661,7 @@ const flipCss = () => `scale(${stampSt.flipH ? -1 : 1}, ${stampSt.flipV ? -1 : 1
 function startPlacingB(Braw) {
   placing.label = stampSt.src === 'text' ? '文字' : 'スタンプ';
   if (!state.active) return toast('彫るレイヤーを選んでください', 'err');
-  const B = softenBitmap(flipBitmap(Braw, stampSt.flipH, stampSt.flipV), textOpt.soft); if (!B) return toast('スタンプが空です', 'err');
+  const B = softenBitmap(flipBitmap(Braw, stampSt.flipH, stampSt.flipV), textOpt.soft); if (!B) return toast('スタンプが空です', 'err'); placing.Braw = Braw;
   resetTextPreview(); placing.on = true; placing.B = B; placing.drag = false; placing.pending = false; placing.hit = null; placing.k = 1; placing.ang = 0; $('placeAdj').hidden = true; $('quick').hidden = true;
   $('placeBar').hidden = false;
   $('placeMsg').textContent = `「${state.active.name}」の上に指を置くと位置が表示されます。指を離したあと、大きさと回転を調整して「ここに${textOpt.mode === 'engrave' ? '彫る（凹）' : '出す（凸）'}」`;
@@ -1613,16 +1671,33 @@ function rebuildImageStamp() {
   if (!stampFileImg) return;
   stampSt.b.image = imageToBitmap(stampFileImg, stampSt.invert, stampSt.gray); stampSt.th.image = stampSt.b.image ? bitmapThumb(stampSt.b.image) : null;
 }
-function loadStampImage(after) {
-  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+// 写真・画像を選ぶ（ページに置いた入力欄を使う：その場で作った入力欄は一部のスマホで反応しないため）
+function pickImage(cb) {
+  const inp = $('imgIn'); inp.value = '';
   inp.onchange = () => {
-    const f = inp.files[0]; if (!f) return;
-    const url = URL.createObjectURL(f); const img = new Image();
-    img.onload = () => { stampFileImg = img; stampSt.name = f.name; rebuildImageStamp(); if (!stampSt.b.image) toast('黒い部分が見つかりませんでした。「白黒を反転」を試してください', 'err'); after?.(); };
-    img.onerror = () => toast('画像を読み込めませんでした', 'err');
-    img.src = url;
+    const f = inp.files && inp.files[0]; if (!f) return;
+    toast('画像を読み込んでいます…');
+    readImage(f).then((c) => cb(c, f)).catch((err) => toast(err.message || '画像を読み込めませんでした', 'err'));
   };
   inp.click();
+}
+// ファイル → 画像（大きい写真は縮める）。読み方を2通り試す
+function readImage(file, max = 1600) {
+  const heic = /hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name);
+  const fail = () => new Error(heic ? 'HEIC形式の写真はこの画面では読めません。写真アプリで「JPEG」や「互換性優先」で書き出してから選んでください' : '画像を読み込めませんでした（対応していない形式かもしれません）');
+  const toCanvas = (src, w, h) => { const k = Math.min(1, max / Math.max(w, h)); const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k)); c.getContext('2d').drawImage(src, 0, 0, c.width, c.height); return c; };
+  const viaReader = () => new Promise((res, rej) => {
+    const fr = new FileReader(); fr.onerror = () => rej(fail());
+    fr.onload = () => { const im = new Image(); im.onload = () => res(toCanvas(im, im.naturalWidth, im.naturalHeight)); im.onerror = () => rej(fail()); im.src = fr.result; };
+    fr.readAsDataURL(file);
+  });
+  return viaReader().catch(async () => {
+    if (!window.createImageBitmap) throw fail();
+    try { const bm = await createImageBitmap(file); return toCanvas(bm, bm.width, bm.height); } catch { throw fail(); }
+  });
+}
+function loadStampImage(after) {
+  pickImage((img, f) => { stampFileImg = img; stampSt.name = f.name; rebuildImageStamp(); if (!stampSt.b.image) toast('黒い部分が見つかりませんでした。「白黒を反転」を試してください', 'err'); else toast('画像を読み込みました', 'ok'); after?.(); });
 }
 
 function openStampSheet(tab) {
@@ -1734,7 +1809,7 @@ function openDrawer() {
     $('drawStab').oninput = (e) => { drawer.stab = +e.target.value; $('drawStabO').textContent = e.target.value; try { localStorage.setItem('nendo-drawstab', drawer.stab); } catch {} };
     $('drawUndo').onclick = () => { const d = drawer.undo.pop(); if (d) drawer.ctx.putImageData(d, 0, 0); else toast('これ以上戻せません', 'err'); };
     $('drawClear').onclick = () => { pushDrawUndo(); const g2 = drawer.ctx; g2.fillStyle = '#fff'; g2.fillRect(0, 0, cv.width, cv.height); };
-    $('drawLoad').onclick = () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.onchange = () => { const f = inp.files[0]; if (!f) return; const im = new Image(); im.onload = () => { pushDrawUndo(); const g2 = drawer.ctx; g2.fillStyle = '#fff'; g2.fillRect(0, 0, cv.width, cv.height); const k = Math.min(cv.width / im.width, cv.height / im.height); g2.drawImage(im, (cv.width - im.width * k) / 2, (cv.height - im.height * k) / 2, im.width * k, im.height * k); }; im.src = URL.createObjectURL(f); }; inp.click(); };
+    $('drawLoad').onclick = () => pickImage((im) => { pushDrawUndo(); const g2 = drawer.ctx; g2.fillStyle = '#fff'; g2.fillRect(0, 0, cv.width, cv.height); const k = Math.min(cv.width / im.width, cv.height / im.height); g2.drawImage(im, (cv.width - im.width * k) / 2, (cv.height - im.height * k) / 2, im.width * k, im.height * k); toast('画像を下に敷きました', 'ok'); });
     $('drawCancel').onclick = () => { $('drawer').hidden = true; };
     $('drawSavePng').onclick = () => cv.toBlob((b) => { if (b) saveFile(`nendokoneri-stamp-${stamp()}.png`, b); }, 'image/png');
     $('drawKeep').onclick = async () => {
@@ -2253,13 +2328,15 @@ function vslider(id, min, max, get, set, fmt = (v) => Math.round(v)) {
   track.setAttribute('aria-valuemin', min); track.setAttribute('aria-valuemax', max);
   paint(); return paint;
 }
-const paintSize = vslider('vsSize', 12, 220, () => state.size, (v) => (state.size = v));
+const paintSize = vslider('vsSize', 12, 264, () => state.size, (v) => (state.size = v)); // 最大は以前の1.2倍
 vslider('vsStr', 1, 100, () => state.str, (v) => (state.str = v));
 
 $('invBtn').onclick = () => toggleInvert(state.brush);
+function symCount() { return (2 ** state.sym.filter(Boolean).length) * (state.radial > 1 ? state.radial : 1); }
 function symLabel() {
-  const parts = ['左右', '上下', '前後'].filter((_, i) => state.sym[i]); if (state.radial > 1) parts.push('放射' + state.radial);
-  return parts.length ? '対称：' + parts.join('・') : '対称：なし';
+  const AXN = { y: '縦軸', x: '左右軸', z: '前後軸' };
+  const parts = ['左右', '上下', '前後'].filter((_, i) => state.sym[i]); if (state.radial > 1) parts.push(`放射${state.radial}（${AXN[state.radialAx || 'y']}）`);
+  return parts.length ? `対称：${parts.join('・')}（${symCount()}か所）` : '対称：なし';
 }
 function paintSym() { const b = $('symBtn'); b.textContent = symLabel(); b.setAttribute('aria-pressed', state.sym.some(Boolean) || state.radial > 1); }
 const RADIALS = [0, 2, 3, 4, 5, 6, 8, 12];
@@ -2268,17 +2345,34 @@ function openSymSheet() {
     s.append(h3('鏡のように左右・上下・前後へ（複数選べます）'));
     const g = div('symgrid');
     const names = [['X', '左右'], ['Y', '上下'], ['Z', '前後']];
-    names.forEach(([a, n], i) => { const b = btn(`${a}<small>${n}</small>`, () => { state.sym[i] = !state.sym[i]; b.setAttribute('aria-pressed', state.sym[i]); paintSym(); }); b.setAttribute('aria-pressed', state.sym[i]); g.append(b); });
-    s.append(g);
-    s.append(h3('放射（Y軸まわりに同時に彫る数）'));
+    const mb = names.map(([a, n], i) => { const b = btn(`${a}<small>${n}</small>`, () => {
+      state.sym[i] = !state.sym[i];
+      if (state.sym[i] && state.radial > 1) { state.radial = 0; toast('鏡の対称をオンにしたので、放射はオフにしました'); }
+      paint(); }); return b; });
+    mb.forEach((b) => g.append(b)); s.append(g);
+    s.append(h3('放射（軸のまわりに同時に彫る数）'));
     const rg = div('radgrid');
-    const rb = RADIALS.map((n) => { const b = btn(n ? String(n) : 'なし', () => { state.radial = n; rb.forEach((x, j) => x.setAttribute('aria-pressed', RADIALS[j] === n)); paintSym(); }); b.setAttribute('aria-pressed', (state.radial || 0) === n); return b; });
+    const rb = RADIALS.map((n) => btn(n ? String(n) : 'なし', () => {
+      state.radial = n;
+      if (n > 1 && state.sym.some(Boolean)) { state.sym = [false, false, false]; toast('放射をオンにしたので、左右・上下・前後の鏡はオフにしました'); }
+      paint(); }));
     rb.forEach((b) => rg.append(b)); s.append(rg);
+    s.append(h3('放射の回す軸（原点を通る）'));
+    const ag = div('symgrid');
+    const ab = [['y', 'Y', '縦軸（上から見て回る）'], ['x', 'X', '左右の軸（横から見て回る）'], ['z', 'Z', '前後の軸（正面から見て回る）']].map(([k, a, n]) => btn(`${a}<small>${n}</small>`, () => { state.radialAx = k; paint(); }));
+    ab.forEach((b) => ag.append(b)); s.append(ag);
+    const paint = () => {
+      mb.forEach((b, i) => b.setAttribute('aria-pressed', state.sym[i]));
+      rb.forEach((b, j) => b.setAttribute('aria-pressed', (state.radial || 0) === RADIALS[j]));
+      ab.forEach((b, j) => b.setAttribute('aria-pressed', (state.radialAx || 'y') === ['y', 'x', 'z'][j]));
+      paintSym();
+    };
+    paint();
     const g2 = div('grid'); g2.style.marginTop = '12px';
     g2.append(btn('すべて解除', () => { state.sym = [false, false, false]; state.radial = 0; paintSym(); closeSheet(); }));
     g2.append(btn('閉じる', closeSheet));
     s.append(g2);
-    const p = document.createElement('p'); p.className = 'info'; p.textContent = 'XとYを両方選ぶと4か所、XYZすべてで8か所に同時に効きます。放射と組み合わせることもできます。対称の中心は空間の原点です（新しく作ったレイヤーは原点に置かれるので、どれも同じ場所が中心になります）。'; s.append(p);
+    const p = document.createElement('p'); p.className = 'info'; p.textContent = 'XとYを両方選ぶと4か所、XYZすべてで8か所に同時に効きます。鏡（左右・上下・前後）と放射は、どちらか一方だけ使えます。対称の中心は空間の原点です（新しく作ったレイヤーは原点に置かれるので、どれも同じ場所が中心になります）。'; s.append(p);
   });
 }
 $('symBtn').onclick = openSymSheet;
@@ -2359,11 +2453,12 @@ function openMeshSheet() {
 function brushParams(e) {
   const pen = e.pointerType === 'pen';
   const pr = pen ? Math.max(0.05, e.pressure || 0) : 1;
-  const sizePx = state.size * (pen && state.penSize ? 0.4 + 0.6 * pr : 1);
   const str = (state.str / 100) * (pen && state.penStr ? pr : 1);
   let brush = state.brush; let inv = !!state.invB[brush];
   if (e.ctrlKey || e.altKey || e.metaKey) inv = !inv;
   if (state.holdSmooth || e.shiftKey) brush = 'smooth';
+  // つかむ: 触れた瞬間の大きさで範囲が決まる（その瞬間の筆圧はほぼ0）ので、筆圧で大きさを変えない
+  const sizePx = state.size * (pen && state.penSize && brush !== 'grab' ? 0.4 + 0.6 * pr : 1);
   return { sizePx, str, brush, inv, color: state.paintLin };
 }
 const raycaster = new THREE.Raycaster(); const ndc = new THREE.Vector2();
@@ -2415,7 +2510,7 @@ function mirrors(rec = sculpt.rec) {
   state.sym.forEach((on, i) => { if (!on) return; const S = new THREE.Matrix4().makeScale(i === 0 ? -1 : 1, i === 1 ? -1 : 1, i === 2 ? -1 : 1); list = list.concat(list.map((m) => S.clone().multiply(m))); });
   if (state.radial > 1) {
     const out = [];
-    for (let k = 0; k < state.radial; k++) { const Rk = new THREE.Matrix4().makeRotationY((k / state.radial) * Math.PI * 2); for (const m of list) out.push(Rk.clone().multiply(m)); }
+    for (let k = 0; k < state.radial; k++) { const ang = (k / state.radial) * Math.PI * 2; const ax = state.radialAx || 'y'; const Rk = ax === 'x' ? new THREE.Matrix4().makeRotationX(ang) : ax === 'z' ? new THREE.Matrix4().makeRotationZ(ang) : new THREE.Matrix4().makeRotationY(ang); for (const m of list) out.push(Rk.clone().multiply(m)); }
     list = out;
   }
   if (!rec || list.length === 1) return list;
@@ -2534,6 +2629,31 @@ function ringAt(e, show = true) {
   ring.style.left = e.clientX - r.left + 'px'; ring.style.top = e.clientY - r.top + 'px';
   ring.style.width = ring.style.height = P.sizePx + 'px';
   ring.className = P.brush === 'smooth' ? 'smooth' : P.inv ? 'inv' : '';
+  drawSymRings(e, P, !ring.hidden);
+}
+// 対称で同時に効く場所にも丸を出す（裏側は点線）
+function drawSymRings(e, P, show) {
+  const box = $('symRings'); const rec = state.active; const Ms = show && rec ? mirrors(rec) : [];
+  let n = 0;
+  if (Ms.length > 1) {
+    const hit = hitRec(rec, e);
+    if (hit) {
+      const W = rec.mesh.matrixWorld, rc = canvas.getBoundingClientRect(); const hw = hit.point.clone().applyMatrix4(W); const d0 = hw.distanceTo(camera.position);
+      const sm = rec.sm; if (sm.bvhDirty || !sm.bvh) sm.buildBVH();
+      for (let k = 1; k < Ms.length; k++) {
+        const pl = hit.point.clone().applyMatrix4(Ms[k]); const cp = sm.bvh.closestPointToPoint(pl, {}); if (!cp) continue;
+        const w = cp.point.clone().applyMatrix4(W); const q = w.clone().project(camera); if (q.z > 1) continue;
+        const ix = sm.bvh.geometry.index.array, P2 = sm.bvh.geometry.attributes.position.array, f = cp.faceIndex * 3;
+        const A = new V3().fromArray(P2, ix[f] * 3), B = new V3().fromArray(P2, ix[f + 1] * 3), C = new V3().fromArray(P2, ix[f + 2] * 3);
+        const nrm = B.sub(A).cross(C.sub(A)).transformDirection(W); const back = nrm.dot(camera.position.clone().sub(w)) < 0;
+        let el = box.children[n]; if (!el) { el = document.createElement('div'); box.append(el); }
+        const sz = camera.isOrthographicCamera ? P.sizePx : P.sizePx * d0 / Math.max(1e-3, w.distanceTo(camera.position));
+        el.style.display = ''; el.style.left = (q.x + 1) / 2 * rc.width + 'px'; el.style.top = (1 - q.y) / 2 * rc.height + 'px'; el.style.width = el.style.height = sz + 'px';
+        el.className = (back ? 'back' : '') + (P.inv ? ' inv' : ''); n++;
+      }
+    }
+  }
+  for (let i = n; i < box.children.length; i++) box.children[i].style.display = 'none';
 }
 function onDown(e) {
   if (!$('hint').hidden) { $('hint').hidden = true; try { localStorage.setItem('nendo-hint', '1'); } catch {} }
@@ -2631,7 +2751,7 @@ window.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); doRedo(); return; }
   if (/^[1-9]$/.test(e.key) && TOOL_LIST()[+e.key - 1]) selectBrush(TOOL_LIST()[+e.key - 1][0]);
   if (e.key === 'x' || e.key === 'X') toggleInvert(state.brush);
-  if (e.key === '[' || e.key === ']') { state.size = THREE.MathUtils.clamp(state.size * (e.key === ']' ? 1.15 : 0.87), 12, 220); paintSize(); }
+  if (e.key === '[' || e.key === ']') { state.size = THREE.MathUtils.clamp(state.size * (e.key === ']' ? 1.15 : 0.87), 12, 264); paintSize(); }
   if (e.key === 'f' || e.key === 'F') fitView();
   if (e.key === 'Escape') closeSheet();
 });
@@ -2881,7 +3001,7 @@ try { if (localStorage.getItem('nendo-hint')) $('hint').hidden = true; } catch {
   else newScene(false);
   renderLayers();
 })();
-renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); if ($('ring').hidden && $('symRings').firstChild && $('symRings').firstChild.style.display !== 'none') drawSymRings(null, null, false); });
 window.__app = { makeGrid, worldBox, applyVoxel, occupancyAxis, gizmo, state, sculpt, doUndo, get camera() { return camera; }, hitRec, THREE, voxelBuild, signedVol, occupancy, makeGrid, worldBox };
 
 // ---------- mask ----------
@@ -3303,18 +3423,7 @@ function doExport(kind) { const parts = exportParts(); if (!parts.length) return
 function exportWithCheck(kind) { if (kind === 'stl') runCheck('stl'); else doExport(kind); }
 
 // ---------- image shrink for reference ----------
-function shrinkImage(file, max = 2048) {
-  return new Promise((res, rej) => {
-    const url = URL.createObjectURL(file); const img = new Image();
-    img.onload = () => {
-      const k = Math.min(1, max / Math.max(img.width, img.height)); const c = document.createElement('canvas');
-      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', 0.85));
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('画像を読み込めませんでした')); };
-    img.src = url;
-  });
-}
+function shrinkImage(file, max = 2048) { return readImage(file, max).then((c) => c.toDataURL('image/jpeg', 0.85)); }
 // ---------- quality ----------
 function setQuality(q) { quality = q; try { localStorage.setItem('nendo-quality', q); } catch {} renderer.setPixelRatio(dprFor(q)); resize(); }
 
